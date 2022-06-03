@@ -12,6 +12,9 @@ sudo ln -s /Users/<USERNAME>/scripts/aws-dev-tools/connect /usr/local/bin/
 
 **Connect to aws instance**
   
-connect <instance-id> -> connect i-060713ea210043ai5
+connect instance-id 
+  
+  EXAMPLE 
+    connect i-060713ea210043ai5
 
   **ENJOY!**
