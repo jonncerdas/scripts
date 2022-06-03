@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Ensure that the value of next ssh port to use is written to the file
+x_file=~/.port_number_counter
+trap 'printf '%s' "$db_port_number" > "$x_file"' EXIT
+
+read ssh_port_number < "$x_file"
+ssh_port_number=$((ssh_port_number+1))
+db_port_number=$((ssh_port_number+1))
+
+result=(
+    $ssh_port_number
+    $db_port_number
+)
+
+printf '%s\0' "${result[@]}"
+exit

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+ports=()
+while IFS= read -r -d '' entry; do
+  ports+=( "$entry" )
+done < <(get_ports)
+
+ssh_port_number=${ports[0]}
+db_port_number=${ports[1]}
+
+# set tmux session name
+tmux_session_name=$(sed "s/[^a-zA-Z0-9]//g" <<< $(openssl rand -base64 17))
+# create a new tmux session
+tmux new-session -d -s $tmux_session_name
+# Split pane 2 vertiacally by 77%
+tmux split-window -d -t $tmux_session_name -p23
+# Select pane 1
+tmux selectp -t 1
+# Split pane 1 horizontally
+tmux split-window -d -t $tmux_session_name -h
+# Start ssm session
+tmux send-keys "start_session $1 22 $ssh_port_number" C-m
+# Select pane 2, start ssm session
+tmux selectp -t 2
+tmux send-keys "start_session $1 5432 $db_port_number" C-m
+# Go back to pane 0 and start ssh session
+tmux selectp -t 0
+tmux send-keys "ssh root@localhost -p $ssh_port_number"
+# Finished setup, attach to the tmux session!
+tmux attach-session -t $tmux_session_name
